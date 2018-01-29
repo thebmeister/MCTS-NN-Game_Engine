@@ -90,7 +90,6 @@ def Train(practice_sessions, minibatch_size, eta, network_sizes):
 		Practice_Session(minibatch_size, eta)
 		print("practice session {0} completed\n".format(s))
 	print("training complete\n")
-	print(
 
 def MUCTPlayHuman():
 	""" Play a sample game between MUCT player and human. Computer plays first.
