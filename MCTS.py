@@ -133,6 +133,14 @@ class OXOState:
         self.playerJustMoved = 3 - self.playerJustMoved
         self.board[move] = self.playerJustMoved
         
+    def UndoMove(self, lastmove):
+        """ Update a state by undoing out the given lastmove.
+            Must update playerToMove.
+        """
+        assert lastmove >= 0 and lastmove <= 8 and lastmove == int(lastmove) and self.board[lastmove] != 0
+        self.playerJustMoved = 3 - self.playerJustMoved
+        self.board[lastmove] = 0
+        
     def GetMoves(self):
         """ Get all possible moves from this state.
         """
