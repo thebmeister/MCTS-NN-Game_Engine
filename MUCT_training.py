@@ -1,7 +1,6 @@
 """
 MUCT_training.py
 ~~~~~~~~~~~~~~~~
-
 Here is where we train the engine. We start by initializing the neural network 
 with random weights. After each practice session we update the network based on 
 the results of the modified-UCT player vs itself. As the network improves, the 
@@ -42,13 +41,14 @@ def MUCT(rootstate, itermax, verbose = False):
 			
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
         while state.GetMoves() != []: # while state is non-terminal
-			newboards = []
-			for move in state.GetMoves():
-				state.DoMove(move)
-				newboards.append(state.board)
-				state.UndoMove(move)
-            weights = softmax(EvalNetwork.feedforward(newboards[i]) for i in range(state.GetMoves())
-            state.DoMove(random.choices(state.GetMoves(), weights=weights))
+        	newboards = []
+        	for move in state.GetMoves():
+        		state.DoMove(move)
+        		newboards.append(state.board)
+        		state.UndoMove(move)
+        	weights = softmax(EvalNetwork.feedforward(newboards[i]) for i in range(len(state.GetMoves())))
+        	rollmov = np.random.choices(state.GetMoves(), weights = weights)
+        	state.DoMove(rollmov)
 
         # Backpropagate
         while node != None : # backpropagate from the expanded node and work back to the root node
@@ -133,13 +133,13 @@ if __name__ == "__main__":
 	while isinstance(hiddenlayerneurons, int) != True or hiddenlayerneurons < 0:
 		hiddenlayerneurons = eval(input("Error: Please input a positive integer.\n"))  
 	networksizes = [9, hiddenlayerneurons, 1]
-	eta = eval(input("What learning rate would you like to use?\n")
+	eta = eval(input("What learning rate would you like to use?\n"))
 	while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
 		eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
-	minibatchsize = eval(input("How many games per practice session?\n")
+	minibatchsize = eval(input("How many games per practice session?\n"))
 	while isinstance(minibatchsize, int) != True or minibatchsize < 0:
 		minibatchsize = eval(input("Error: Please input a positive integer.\n"))
-	numsessions = eval(input("How many practice sessions to complete training?\n")
+	numsessions = eval(input("How many practice sessions to complete training?\n"))
 	while isinstance(numsessions, int) != True or numsessions < 0:
 		numsessions = eval(input("Error: Please input a positive integer.\n"))
 	Train(numsessions, minibatchsize, eta, networksizes)
@@ -148,7 +148,6 @@ if __name__ == "__main__":
 """
 IDEAS FOR FUTURE IMPROVEMENTS
 ~~~~~~~~~~~
-
 - Would like to include method for storing the trained network in a file.
 - Would like to create interface for playing the games--probably importing a different file.
 """
