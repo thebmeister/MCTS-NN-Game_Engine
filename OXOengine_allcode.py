@@ -1,12 +1,11 @@
 """
-OXOengine_allcode
+OXOengine_allcode.py
 ~~~~~~~~~~~~~~~~
 This messy conglomeration is the first working code I made that successfully 
 incorporates neural network into the MCTS, and trains the Neural Network on the games it plays against itself.
 The code should be split into distinct files, but I was having trouble with importing the files so I just
 copy-pasted everything into this one.
 """
-
 
 """
 network.py
@@ -108,15 +107,12 @@ class Network(object):
         activations = [activation] # list to store all the activations, layer by layer
         zs = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
-            print(w.shape)
             z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        print(zs)
         delta = activations[-1] - y
-        print(delta.shape)
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, np.transpose(activations[-2]))
         # Note that the variable l in the loop below is used a little
@@ -128,7 +124,6 @@ class Network(object):
         for l in range(2, self.num_layers):
             z = zs[-l]
             delta = np.dot(np.transpose(self.weights[-l+1]), delta)
-            print(delta.shape)
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, np.transpose(activations[-l-1]))
         return (nabla_b, nabla_w)
@@ -595,7 +590,7 @@ better training data. This in turn improves the performance of the neural networ
 The resulting feedback loop rapidly improves the skill of the eninge until,
 eventually, it reaches an expert level.
 """
-import numpy as np
+# import numpy as np
 
 def softmax(values):
     tot = sum(np.exp(values))
@@ -684,7 +679,6 @@ def Practice_Session(minibatch_size, eta):
     for i in range(minibatch_size):
         d = MUTCPlayGame()
         training_data += d
-    print(training_data)
     EvalNetwork.update_mini_batch(training_data, eta)
 
 def Train(practice_sessions, minibatch_size, eta):
@@ -694,59 +688,59 @@ def Train(practice_sessions, minibatch_size, eta):
 	print("training complete\n")
 
 def MUCTPlayHuman():
-        """ Play a sample game between MUCT player and human. Computer plays first.
-        Number of MUCT iterations is adjustable
-        """
-        playagain = "y"
-        while playagain == "y":
-                # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
-                state = OXOState() # uncomment to play OXO
-                # state = NimState(15) # uncomment to play Nim with the given number of starting chips
-                iterations = eval(input("How many UTC iterations does the Computer opponent get?\n(The more iterations the better it plays, but any \nnumber nabove 10000 will cause it to run slowly)\n"))
+    """ Play a sample game between MUCT player and human. Computer plays first.
+    Number of MUCT iterations is adjustable
+    """
+    playagain = "y"
+    while playagain == "y":
+        # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
+        state = OXOState() # uncomment to play OXO
+        # state = NimState(15) # uncomment to play Nim with the given number of starting chips
+        iterations = eval(input("How many UTC iterations does the Computer opponent get?\n(The more iterations the better it plays, but any \nnumber above 10000 will cause it to run slowly)\n"))
         while isinstance(iterations, int) != True or iterations < 0:
-                iterations = eval(input("Error: Please input a positive integer.\n"))
+            iterations = eval(input("Error: Please input a positive integer.\n"))
         humanplayer = eval(input("Would you like to be player 1 or 2?\n"))
         while humanplayer != 1 and humanplayer != 2:
-                humanplayer = eval(input("Error: Please input either 1 or 2.\n"))
+            humanplayer = eval(input("Error: Please input either 1 or 2.\n"))
         while (state.GetMoves() != []):
-                print(repr(state))
-                if state.playerJustMoved == humanplayer:
-                        m = MUCT(rootstate = state, itermax = iterations, verbose = False)
-                else:
-                        m = eval(input("Where would you like to place your piece? \n0 1 2\n3 4 5\n6 7 8\n")) # Change if not playing OXO
+            print(repr(state))
+            if state.playerJustMoved == humanplayer:
+                m = MUCT(rootstate = state, itermax = iterations, verbose = False)
+            else:
+                m = eval(input("Where would you like to place your piece? \n0 1 2\n3 4 5\n6 7 8\n")) # Change if not playing OXO
                 while state.board[m] != 0:
-                        m = eval(input("Error: Please pick an empty location.\nThese are the remaining empty locations:\n" + str(state.GetMoves()) + "\n"))
-                state.DoMove(m)
+                    m = eval(input("Error: Please pick an empty location.\nThese are the remaining empty locations:\n" + str(state.GetMoves()) + "\n"))
+            state.DoMove(m)
         if state.GetResult(state.playerJustMoved) == humanplayer:
-                print(repr(state) + "\nYou win!!\n")
+            print(repr(state) + "\nYou win!!\n")
         elif state.GetResult(state.playerJustMoved) == (3 - humanplayer):
-                print(repr(state) + "\nYou lose.\n")
+            print(repr(state) + "\nYou lose.\n")
         else:
-                print(repr(state) + "\nIt's a draw!\n")
+            print(repr(state) + "\nIt's a draw!\n")
         playagain = input("Play Again? (y or n)\n")
         while playagain != "y" and playagain != "n":
-                playagain = input("Error: Please input either y or n.\n")
-        print("Goodbye.")
+            playagain = input("Error: Please input either y or n.\n")
+    print("Goodbye.")
 							  
 if __name__ == "__main__":
-        """ Play as human v the MUCT player 
-        """
-        # hiddenlayerneurons = eval(input("How many hidden layer neurons for this model?\n"))
-        # while isinstance(hiddenlayerneurons, int) != True or hiddenlayerneurons < 0:
-        #         hiddenlayerneurons = eval(input("Error: Please input a positive integer.\n"))  
-        networksizes = [9,27,1]# [9, hiddenlayerneurons, 1]
-        eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
-        # while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
-        #         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
-        minibatchsize = 10# eval(input("How many games per practice session?\n"))
-        # while isinstance(minibatchsize, int) != True or minibatchsize < 0:
-        #         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
-        numsessions = 11# eval(input("How many practice sessions to complete training?\n"))
-        # while isinstance(numsessions, int) != True or numsessions < 0:
-        #         numsessions = eval(input("Error: Please input a positive integer.\n"))
-        EvalNetwork = Network(networksizes)
-        Train(numsessions, minibatchsize, eta)
-        MUCTPlayHuman()
+	""" Play as human v the MUCT player
+	"""
+	# hiddenlayerneurons = eval(input("How many hidden layer neurons for this model?\n"))
+	# while isinstance(hiddenlayerneurons, int) != True or hiddenlayerneurons < 0:
+	#         hiddenlayerneurons = eval(input("Error: Please input a positive integer.\n"))
+	networksizes = [9,27,1]# [9, hiddenlayerneurons, 1]
+	eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
+	# while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
+	#         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
+	minibatchsize = 10# eval(input("How many games per practice session?\n"))
+	# while isinstance(minibatchsize, int) != True or minibatchsize < 0:
+	#         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
+	numsessions = 11# eval(input("How many practice sessions to complete training?\n"))
+	# while isinstance(numsessions, int) != True or numsessions < 0:
+	#         numsessions = eval(input("Error: Please input a positive integer.\n"))
+	EvalNetwork = Network(networksizes)
+	Train(numsessions, minibatchsize, eta)
+	MUCTPlayHuman()
 
 """
 IDEAS FOR FUTURE IMPROVEMENTS
