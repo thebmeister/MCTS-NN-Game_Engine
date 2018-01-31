@@ -63,8 +63,8 @@ class Connect4State(object):
 		winchecks = []
 		for location in winlocations:
 			wc = []
-			for height, column in location:
-				wc.append(state.board[height][column])
+			for h, c in location:
+				wc.append(state.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
 			if w = x = y = z != 0:
@@ -79,8 +79,8 @@ class Connect4State(object):
 		winchecks = []
 		for location in winlocations:
 			wc = []
-			for height, column in location:
-				wc.append(state.board[height][column])
+			for h, c in location:
+				wc.append(state.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
 			if w = x = y = z != 0:
@@ -95,4 +95,15 @@ class Connect4State(object):
 	def __repr__(self):
 		""" Don't need this - but good style.
 		"""
-		pass
+		places = ((5,0)  (5,1)  (5,2)  (5,3)  (5,4)  (5,5)  (5,6)\
+				  (4,0)  (4,1)  (4,2)  (4,3)  (4,4)  (4,5)  (4,6)\
+				  (3,0)  (3,1)  (3,2)  (3,3)  (3,4)  (3,5)  (3,6)\
+				  (2,0)  (2,1)  (2,2)  (2,3)  (2,4)  (2,5)  (2,6)\
+				  (1,0)  (1,1)  (1,2)  (1,3)  (1,4)  (1,5)  (1,6)\
+				  (0,0)  (0,1)  (0,2)  (0,3)  (0,4)  (0,5)  (0,6))
+		s = " "
+		for h, c in places:
+			s += "_12"[self.board[h][c]] + " "
+			if c == 6: s += "\n "
+		return s
+			
