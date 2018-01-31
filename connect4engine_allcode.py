@@ -5,7 +5,6 @@ Another messy conglomeration of code.
 This time we're training a connect 4 engine, which should be more
 fun to play against hopefully. Also a better guage of the effectiveness
 of the method for training the engine.
-
 This time, I at least deleted most of the code that wasn't being used.
 """
 """
@@ -185,10 +184,10 @@ class Connect4State(object):
 		for location in winlocations:
 			wc = []
 			for h, c in location:
-				wc.append(state.board[h][c])
+				wc.append(self.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
-			if w = x = y = z != 0:
+			if w == x == y == z != 0:
 				return []
 		moves = [i for i in range(6) if self.heights[i] < 6]
 		return moves
@@ -201,10 +200,10 @@ class Connect4State(object):
 		for location in winlocations:
 			wc = []
 			for h, c in location:
-				wc.append(state.board[h][c])
+				wc.append(self.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
-			if w = x = y = z != 0:
+			if w == x == y == z != 0:
 				if self.playerJustMoved == playerjm:
 					return 1
 				else:
@@ -284,22 +283,6 @@ class Node:
         for c in self.childNodes:
              s += str(c) + "\n"
         return s
-		
-def GetHumanMove():
-    """ Ask human player for move and determine if it's legal.
-		If not, ask again - if so, return that move
-    """
-    m = eval(input("These are the legal moves:\n" + str(state.GetMoves()) + "\nWhat's your move?\n"))
-    legal = 0
-	for legal_move in state.GetMoves():
-		if m == legal_move:
-			legal += 1
-    while legal == 0:
-		m = eval(input("Error: Invalid move.\nThese are the legal moves:\n" + str(state.GetMoves()) + "\n"))
-        for legal_move in state.GetMoves():
-            if m == legal_move:
-                legal += 1
-	return m
 	
 """
 MUCT_training.py
@@ -372,13 +355,14 @@ def MUTCPlayGame():
         rollouts that are likely instead of just random. Backpropagates to returns list of tuples, with the state.board
     """
     # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
-    state = OXOState() # uncomment to play OXO
+    # state = OXOState() # uncomment to play OXO
+    state = Connect4State()
     # state = NimState(15) # uncomment to play Nim with the given number of starting chips
     boards = []
     while (state.GetMoves() != []):
         m = MUCT(rootstate = state, itermax = 12, verbose = False) # play with values for itermax and verbose = True
         state.DoMove(m)
-		simpleboard = [piece for layer in state.board for piece in layer]
+        simpleboard = [piece for layer in state.board for piece in layer]
         boards.append(simpleboard)
     if state.GetResult(state.playerJustMoved) == 1:
         result = 1
@@ -410,6 +394,22 @@ def Train(practice_sessions, minibatch_size, eta):
 		print("practice session {0} completed\n".format(s))
 	print("training complete\n")
 
+def GetHumanMove(state):
+    """ Ask human player for move and determine if it's legal.
+		If not, ask again - if so, return that move
+    """
+    m = eval(input("These are the legal moves:\n" + str(state.GetMoves()) + "\nWhat's your move?\n"))
+    legal = 0
+    for legal_move in state.GetMoves():
+        if m == legal_move:
+            legal += 1
+    while legal == 0:
+        m = eval(input("Error: Invalid move.\nThese are the legal moves:\n" + str(state.GetMoves()) + "\n"))
+        for legal_move in state.GetMoves():
+            if m == legal_move:
+                legal += 1
+    return m
+
 def MUCTPlayHuman():
     """ Play a sample game between MUCT player and human. Computer plays first.
     Number of MUCT iterations is adjustable
@@ -417,7 +417,8 @@ def MUCTPlayHuman():
     playagain = "y"
     while playagain == "y":
         # state = OthelloState(4) # uncomment to play Othello on a square board of the given size
-        state = OXOState() # uncomment to play OXO
+        # state = OXOState() # uncomment to play OXO
+        state = Connect4State()
         # state = NimState(15) # uncomment to play Nim with the given number of starting chips
         iterations = eval(input("How many UTC iterations does the Computer opponent get?\n(The more iterations the better it plays, but any \nnumber above 10000 will cause it to run slowly)\n"))
         while isinstance(iterations, int) != True or iterations < 0:
@@ -430,7 +431,7 @@ def MUCTPlayHuman():
             if state.playerJustMoved == humanplayer:
                 m = MUCT(rootstate = state, itermax = iterations, verbose = False)
             else:
-                m = GetHumanMove()
+                m = GetHumanMove(state)
             state.DoMove(m)
         if state.GetResult(state.playerJustMoved) == humanplayer:
             print(repr(state) + "\nYou win!!\n")
