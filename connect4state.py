@@ -24,6 +24,7 @@ class Connect4State(object):
 		self.board = [] # 0 = empty, 1 = player 1, 2 = player 2
 		for i in range(6):
 			self.board.append([0]*7)
+		self.heights = [0]*7
 
 	def Clone(self):
 		""" Create a deep clone of this game state.
@@ -31,6 +32,7 @@ class Connect4State(object):
 		st = Connect4State()
 		st.playerJustMoved = self.playerJustMoved
 		st.board = self.board
+		st.heights = self.heights
 		return st
 
 	def DoMove(self, move):
@@ -38,16 +40,27 @@ class Connect4State(object):
 			Must update playerJustMoved.
 		"""
 		self.playerJustMoved = 3 - self.playerJustMoved
-
+		assert self.heights[move] < 6
+		self.board[self.heights[move]][move] = self.playerJustMoved
+		self.heights[move] += 1
+		
 	def UndoMove(self, lastmove):
 		""" Update a state by undoing the given move.
 			Must update playerJustMoved.
 		"""
+		self.heights[lastmove] -= 1
+		self.board[self.heights[lastmove]][lastmove] = 0
 		self.playerJustMoved = 3 - self.playerJustMoved
 
 	def GetMoves(self):
 		""" Get all possible moves from this state.
+			in pseudocode:
+			First check if game is over.
+			if yes: no moves left
+			if no: return all columns that haven't been filled to the top
 		"""
+		moves = [i for i in range(6) if self.heights[i] < 6]
+		return moves
 
 	def GetResult(self, playerjm):
 		""" Get the game result from the viewpoint of playerjm. 
