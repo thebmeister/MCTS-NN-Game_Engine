@@ -59,12 +59,38 @@ class Connect4State(object):
 			if yes: no moves left
 			if no: return all columns that haven't been filled to the top
 		"""
+		winlocations  = () # update with all 69 possible win locations as a tuple of tuple of tuples
+		winchecks = []
+		for location in winlocations:
+			wc = []
+			for height, column in location:
+				wc.append(state.board[height][column])
+			winchecks.append(wc)
+		for w, x, y, z in winchecks:  
+			if w = x = y = z != 0:
+				return []
 		moves = [i for i in range(6) if self.heights[i] < 6]
 		return moves
 
 	def GetResult(self, playerjm):
 		""" Get the game result from the viewpoint of playerjm. 
 		"""
+		winlocations  = () # update with all 69 possible win locations as a tuple of tuple of tuples
+		winchecks = []
+		for location in winlocations:
+			wc = []
+			for height, column in location:
+				wc.append(state.board[height][column])
+			winchecks.append(wc)
+		for w, x, y, z in winchecks:  
+			if w = x = y = z != 0:
+				if self.playerJustMoved == playerjm:
+					return 1
+				else:
+					return 0
+		if self.GetMoves() == []: return 0.5 # draw
+		assert False # shouldn't be possible to get here
+				
 
 	def __repr__(self):
 		""" Don't need this - but good style.
