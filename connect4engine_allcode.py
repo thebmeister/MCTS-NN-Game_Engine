@@ -215,12 +215,12 @@ class Connect4State(object):
 	def __repr__(self):
 		""" Don't need this - but good style.
 		"""
-		places = ((5,0)  (5,1)  (5,2)  (5,3)  (5,4)  (5,5)  (5,6)\
-				  (4,0)  (4,1)  (4,2)  (4,3)  (4,4)  (4,5)  (4,6)\
-				  (3,0)  (3,1)  (3,2)  (3,3)  (3,4)  (3,5)  (3,6)\
-				  (2,0)  (2,1)  (2,2)  (2,3)  (2,4)  (2,5)  (2,6)\
-				  (1,0)  (1,1)  (1,2)  (1,3)  (1,4)  (1,5)  (1,6)\
-				  (0,0)  (0,1)  (0,2)  (0,3)  (0,4)  (0,5)  (0,6))
+		places = ((5,0),  (5,1),  (5,2),  (5,3),  (5,4),  (5,5),  (5,6),\
+				  (4,0),  (4,1),  (4,2),  (4,3),  (4,4),  (4,5),  (4,6),\
+				  (3,0),  (3,1),  (3,2),  (3,3),  (3,4),  (3,5),  (3,6),\
+				  (2,0),  (2,1),  (2,2),  (2,3),  (2,4),  (2,5),  (2,6),\
+				  (1,0),  (1,1),  (1,2),  (1,3),  (1,4),  (1,5),  (1,6),\
+				  (0,0),  (0,1),  (0,2),  (0,3),  (0,4),  (0,5),  (0,6))
 		s = " "
 		for h, c in places:
 			s += "_12"[self.board[h][c]] + " "
@@ -329,8 +329,8 @@ def MUCT(rootstate, itermax, verbose = False):
             boardevals = []
             for move in state.GetMoves():
                 state.DoMove(move)
-                newboard = state.board
-                boardeval = EvalNetwork.feedforward(newboard)[0, 0]
+                newsimpleboard = [piece for layer in state.board for piece in layer]
+                boardeval = EvalNetwork.feedforward(newsimpleboard)[0, 0]
                 boardevals.append(boardeval)
                 state.UndoMove(move)
             weights = softmax(boardevals)
