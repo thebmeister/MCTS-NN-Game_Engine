@@ -1,14 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 31 15:58:51 2018
+
+@author: bmilway
+"""
+
 """
 MCTS.py
 ~~~~~~~
 Below is the comment from the original code which I, Brendan Milway, have added bits and pieces to:
-
 This is a very simple implementation of the UCT Monte Carlo Tree Search algorithm in Python 2.7.
 The function UCT(rootstate, itermax, verbose = False) is towards the bottom of the code.
 It aims to have the clearest and simplest possible code, and for the sake of clarity, the code
 is orders of magnitude less efficient than it could be made, particularly by using a 
 state.GetRandomMove() or state.DoRandomRollout() function.
-
 Example GameState classes for Nim, OXO and Othello are included to give some idea of how you
 can write your own GameState use UCT in your 2-player game. Change the game to be played in 
 the UCTPlayGame() function at the bottom of the code.
@@ -17,12 +22,11 @@ Written by Peter Cowling, Ed Powley, Daniel Whitehouse (University of York, UK) 
  
 Licence is granted to freely use and distribute for any sensible/legal purpose so long as this comment
 remains in any distributed code.
-
 For more information about Monte Carlo Tree Search check out our web site at www.mcts.ai
 """ 
-
-from math import *
-import random
+import numpy as np
+# from math import *
+# import random
 
 class GameState:
     """ A state of the game, i.e. the game board. These are the only functions which are
@@ -192,8 +196,8 @@ class Connect4State(object):
 		"""
 		st = Connect4State()
 		st.playerJustMoved = self.playerJustMoved
-		st.board = self.board
-		st.heights = self.heights
+		st.board = [self.board[i][:] for i in range(6)]
+		st.heights = self.heights[:]
 		return st
 
 	def DoMove(self, move):
@@ -201,7 +205,7 @@ class Connect4State(object):
 			Must update playerJustMoved.
 		"""
 		self.playerJustMoved = 3 - self.playerJustMoved
-		assert self.heights[move] < 6
+		print(self.heights)#assert self.heights[move] < 6
 		self.board[self.heights[move]][move] = self.playerJustMoved
 		self.heights[move] += 1
 		
@@ -400,7 +404,7 @@ class Node:
             lambda c: c.wins/c.visits + UCTK * sqrt(2*log(self.visits)/c.visits to vary the amount of
             exploration versus exploitation.
         """
-        s = sorted(self.childNodes, key = lambda c: c.wins/c.visits + sqrt(2*log(self.visits)/c.visits))[-1]
+        s = sorted(self.childNodes, key = lambda c: c.wins/c.visits + np.sqrt(2*np.log(self.visits)/c.visits))[-1]
         return s
     
     def AddChild(self, m, s):
@@ -458,22 +462,26 @@ def UCT(rootstate, itermax, verbose = False):
 
         # Expand
         if node.untriedMoves != []: # if we can expand (i.e. state/node is non-terminal)
-            m = random.choice(node.untriedMoves) 
+            m = np.random.choice(node.untriedMoves) 
             state.DoMove(m)
             node = node.AddChild(m,state) # add child and descend tree
 
         # Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function
         while state.GetMoves() != []: # while state is non-terminal
-            state.DoMove(random.choice(state.GetMoves()))
+            state.DoMove(np.random.choice(state.GetMoves()))
 
         # Backpropagate
         while node != None: # backpropagate from the expanded node and work back to the root node
             node.Update(state.GetResult(node.playerJustMoved)) # state is terminal. Update node with result from POV of node.playerJustMoved
             node = node.parentNode
+            
+        print("iteration " + str(i) + " completed")
 
     # Output some information about the tree - can be omitted
     if (verbose): print(rootnode.TreeToString(0))
-    else: print(rootnode.ChildrenToString())
+    # else: print(rootnode.ChildrenToString())
+    
+    return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that was most visited
                 
 def UCTPlayGame():
     """ Play a sample game between two UCT players where each player gets a different number 
@@ -497,21 +505,21 @@ def UCTPlayGame():
         print("Player " + str(3 - state.playerJustMoved) + " wins!")
     else: print("Nobody wins!")
 
-def GetHumanMove():
+def GetHumanMove(state):
     """ Ask human player for move and determine if it's legal.
 		If not, ask again - if so, return that move
     """
     m = eval(input("These are the legal moves:\n" + str(state.GetMoves()) + "\nWhat's your move?\n"))
     legal = 0
-	for legal_move in state.GetMoves():
-		if m == legal_move:
-			legal += 1
+    for legal_move in state.GetMoves():
+        if m == legal_move:
+            legal += 1
     while legal == 0:
-		m = eval(input("Error: Invalid move.\nThese are the legal moves:\n" + str(state.GetMoves()) + "\n"))
+        m = eval(input("Error: Invalid move.\nThese are the legal moves:\n" + str(state.GetMoves()) + "\n"))
         for legal_move in state.GetMoves():
             if m == legal_move:
                 legal += 1
-	return m
+    return m
         
 def UTCPlayVsHuman():
     """ Play a sample game between UCT player and human. Computer plays first.
@@ -534,7 +542,7 @@ def UTCPlayVsHuman():
             if state.playerJustMoved == humanplayer:
                 m = UCT(rootstate = state, itermax = iterations, verbose = False)
             else:
-                m = GetHumanMove()
+                m = GetHumanMove(state)
             state.DoMove(m)
         if state.GetResult(state.playerJustMoved) == humanplayer:
             print(repr(state) + "\nYou win!!\n")
@@ -552,7 +560,5 @@ if __name__ == "__main__":
     """
     UTCPlayVsHuman()
 
-            
                           
             
-
