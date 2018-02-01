@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 31 15:58:51 2018
-
 @author: bmilway
 """
 
@@ -205,7 +204,7 @@ class Connect4State(object):
 			Must update playerJustMoved.
 		"""
 		self.playerJustMoved = 3 - self.playerJustMoved
-		print(self.heights)#assert self.heights[move] < 6
+		assert self.heights[move] < 6
 		self.board[self.heights[move]][move] = self.playerJustMoved
 		self.heights[move] += 1
 		
@@ -475,11 +474,10 @@ def UCT(rootstate, itermax, verbose = False):
             node.Update(state.GetResult(node.playerJustMoved)) # state is terminal. Update node with result from POV of node.playerJustMoved
             node = node.parentNode
             
-        print("iteration " + str(i) + " completed")
 
     # Output some information about the tree - can be omitted
     if (verbose): print(rootnode.TreeToString(0))
-    # else: print(rootnode.ChildrenToString())
+    else: print(rootnode.ChildrenToString())
     
     return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that was most visited
                 
@@ -544,9 +542,9 @@ def UTCPlayVsHuman():
             else:
                 m = GetHumanMove(state)
             state.DoMove(m)
-        if state.GetResult(state.playerJustMoved) == humanplayer:
+        if state.GetResult(humanplayer) == 1:
             print(repr(state) + "\nYou win!!\n")
-        elif state.GetResult(state.playerJustMoved) == (3 - humanplayer):
+        elif state.GetResult(humanplayer) == 0:
             print(repr(state) + "\nYou lose.\n")
         else:
             print(repr(state) + "\nIt's a draw!\n")
@@ -559,6 +557,4 @@ if __name__ == "__main__":
     """ Play a single game to the end using UCT for both players. 
     """
     UTCPlayVsHuman()
-
-                          
-            
+    
