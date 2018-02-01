@@ -145,16 +145,16 @@ class Connect4State(object):
 		for i in range(6):
 			self.board.append([0]*7)
 		self.heights = [0]*7
-
+	
 	def Clone(self):
 		""" Create a deep clone of this game state.
 		"""
 		st = Connect4State()
 		st.playerJustMoved = self.playerJustMoved
-		st.board = self.board
-		st.heights = self.heights
+		st.board = [self.board[i][:] for i in range(6)]
+		st.heights = self.heights[:]
 		return st
-
+	
 	def DoMove(self, move):
 		""" Update a state by carrying out the given move.
 			Must update playerJustMoved.
