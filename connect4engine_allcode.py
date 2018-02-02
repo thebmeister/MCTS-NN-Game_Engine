@@ -301,7 +301,7 @@ def softmax(values):
     tot = sum(np.exp(values))
     return [i/tot for i in np.exp(values)]
 
-def MUCT(rootstate, itermax, verbose = False):
+def MUCT(evalnetwork, rootstate, itermax, verbose = False):
     """ Conduct a modified UCT search for itermax iterations starting from rootstate.
         Rollouts moves are chosen based on the neural network.
         Return the best move from the rootstate.
@@ -330,12 +330,12 @@ def MUCT(rootstate, itermax, verbose = False):
             for move in state.GetMoves():
                 state.DoMove(move)
                 newsimpleboard = [piece for layer in state.board for piece in layer]
-                boardeval = EvalNetwork.feedforward(newsimpleboard)[0, 0]
+                boardeval = evalnetwork.feedforward(newsimpleboard)[0, 0]
                 boardevals.append(boardeval)
                 state.UndoMove(move)
             weights = softmax(boardevals)
             assert len(weights) == len(state.GetMoves())
-            # assert sum(weights) == 1 # this should be true though...
+            # assert sum(weights) > 0.9 and sum(weights) < 1.1 # this should be true though...
             rollmov = np.random.choice(state.GetMoves(), p = weights)
             state.DoMove(rollmov)
 
@@ -350,7 +350,7 @@ def MUCT(rootstate, itermax, verbose = False):
 
     return sorted(rootnode.childNodes, key = lambda c: c.visits)[-1].move # return the move that was most visited
 
-def MUTCPlayGame():
+def MUTCPlayGame(evalnetwork):
     """ Play a sample game between to players using a UTC method modified by the Neural Network evaluation to select
         rollouts that are likely instead of just random. Backpropagates to returns list of tuples, with the state.board
     """
@@ -360,7 +360,7 @@ def MUTCPlayGame():
     # state = NimState(15) # uncomment to play Nim with the given number of starting chips
     boards = []
     while (state.GetMoves() != []):
-        m = MUCT(rootstate = state, itermax = 50, verbose = False) # play with values for itermax and verbose = True
+        m = MUCT(evalnetwork, rootstate = state, itermax = 50, verbose = False) # play with values for itermax and verbose = True
         state.DoMove(m)
         simpleboard = [piece for layer in state.board for piece in layer]
         boards.append(simpleboard)
@@ -381,18 +381,22 @@ def MUTCPlayGame():
         data = [(x,y) for x, y in zip(boards, results)]
         return data
 
-def Practice_Session(minibatch_size, eta):
+def Practice_Session(minibatch_size, eta, evalnetwork):
     training_data = []
     for i in range(minibatch_size):
-        d = MUTCPlayGame()
+        d = MUTCPlayGame(evalnetwork)
         training_data += d
-    EvalNetwork.update_mini_batch(training_data, eta)
+    evalnetwork.update_mini_batch(training_data, eta)
 
-def Train(practice_sessions, minibatch_size, eta, network):
-	for s in range(practice_sessions):
-		Practice_Session(minibatch_size, eta)
-		print("practice session {0} completed\n".format(s))
-	print("training complete\nWeights: " + str(EvalNetwork.weights) + "\nBiases: " + EvalNetwork.biases)
+def Train(practice_sessions, minibatch_size, eta, evalnetwork):
+    for s in range(practice_sessions):
+        Practice_Session(minibatch_size, eta, evalnetwork)
+        print("practice session {0} completed\n".format(s))
+    print("training complete\nWeights: ")
+    print(evalnetwork.weights)
+    print("\nBiases: ")
+    print(evalnetwork.biases)
+    return evalnetwork
 
 def GetHumanMove(state):
     """ Ask human player for move and determine if it's legal.
@@ -410,7 +414,7 @@ def GetHumanMove(state):
                 legal += 1
     return m
 
-def MUCTPlayHuman():
+def MUCTPlayHuman(evalnetwork):
     """ Play a sample game between MUCT player and human. Computer plays first.
     Number of MUCT iterations is adjustable
     """
@@ -429,7 +433,7 @@ def MUCTPlayHuman():
         while (state.GetMoves() != []):
             print(repr(state))
             if state.playerJustMoved == humanplayer:
-                m = MUCT(rootstate = state, itermax = iterations, verbose = False)
+                m = MUCT(evalnetwork, rootstate = state, itermax = iterations, verbose = False)
             else:
                 m = GetHumanMove(state)
             state.DoMove(m)
@@ -456,17 +460,17 @@ if __name__ == "__main__":
     eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
     # while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
     #         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
-    minibatchsize = 10# eval(input("How many games per practice session?\n"))
+    minibatchsize = 5# eval(input("How many games per practice session?\n"))
     # while isinstance(minibatchsize, int) != True or minibatchsize < 0:
     #         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
-    numsessions = 15# eval(input("How many practice sessions to complete training?\n"))
+    numsessions = 1# eval(input("How many practice sessions to complete training?\n"))
     # while isinstance(numsessions, int) != True or numsessions < 0:
     #         numsessions = eval(input("Error: Please input a positive integer.\n"))
     EvalNetwork = Network(networksizes)
     # EvalNetwork.weights = 
     # EvalNetwork.biases = 
-    Train(numsessions, minibatchsize, eta, EvalNetwork)
-    MUCTPlayHuman()
+    EvalNetwork = Train(numsessions, minibatchsize, eta, EvalNetwork)
+    MUCTPlayHuman(EvalNetwork)
 
 """
 IDEAS FOR FUTURE IMPROVEMENTS
