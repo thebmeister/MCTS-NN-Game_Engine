@@ -145,7 +145,7 @@ class Connect4State(object):
 		for i in range(6):
 			self.board.append([0]*7)
 		self.heights = [0]*7
-	
+
 	def Clone(self):
 		""" Create a deep clone of this game state.
 		"""
@@ -154,7 +154,7 @@ class Connect4State(object):
 		st.board = [self.board[i][:] for i in range(6)]
 		st.heights = self.heights[:]
 		return st
-	
+
 	def DoMove(self, move):
 		""" Update a state by carrying out the given move.
 			Must update playerJustMoved.
@@ -179,7 +179,7 @@ class Connect4State(object):
 			if yes: no moves left
 			if no: return all columns that haven't been filled to the top
 		"""
-		winlocations  = () # update with all 69 possible win locations as a tuple of tuple of tuples
+		winlocations  = (((0, 0), (0, 1), (0, 2), (0, 3)), ((0, 1), (0, 2), (0, 3), (0, 4)), ((0, 2), (0, 3), (0, 4), (0, 5)), ((0, 3), (0, 4), (0, 5), (0, 6)), ((1, 0), (1, 1), (1, 2), (1, 3)), ((1, 1), (1, 2), (1, 3), (1, 4)), ((1, 2), (1, 3), (1, 4), (1, 5)), ((1, 3), (1, 4), (1, 5), (1, 6)), ((2, 0), (2, 1), (2, 2), (2, 3)), ((2, 1), (2, 2), (2, 3), (2, 4)), ((2, 2), (2, 3), (2, 4), (2, 5)), ((2, 3), (2, 4), (2, 5), (2, 6)), ((3, 0), (3, 1), (3, 2), (3, 3)), ((3, 1), (3, 2), (3, 3), (3, 4)), ((3, 2), (3, 3), (3, 4), (3, 5)), ((3, 3), (3, 4), (3, 5), (3, 6)), ((4, 0), (4, 1), (4, 2), (4, 3)), ((4, 1), (4, 2), (4, 3), (4, 4)), ((4, 2), (4, 3), (4, 4), (4, 5)), ((4, 3), (4, 4), (4, 5), (4, 6)), ((5, 0), (5, 1), (5, 2), (5, 3)), ((5, 1), (5, 2), (5, 3), (5, 4)), ((5, 2), (5, 3), (5, 4), (5, 5)), ((5, 3), (5, 4), (5, 5), (5, 6)), ((0, 0), (1, 0), (2, 0), (3, 0)), ((0, 1), (1, 1), (2, 1), (3, 1)), ((0, 2), (1, 2), (2, 2), (3, 2)), ((0, 3), (1, 3), (2, 3), (3, 3)), ((0, 4), (1, 4), (2, 4), (3, 4)), ((0, 5), (1, 5), (2, 5), (3, 5)), ((0, 6), (1, 6), (2, 6), (3, 6)), ((1, 0), (2, 0), (3, 0), (4, 0)), ((1, 1), (2, 1), (3, 1), (4, 1)), ((1, 2), (2, 2), (3, 2), (4, 2)), ((1, 3), (2, 3), (3, 3), (4, 3)), ((1, 4), (2, 4), (3, 4), (4, 4)), ((1, 5), (2, 5), (3, 5), (4, 5)), ((1, 6), (2, 6), (3, 6), (4, 6)), ((2, 0), (3, 0), (4, 0), (5, 0)), ((2, 1), (3, 1), (4, 1), (5, 1)), ((2, 2), (3, 2), (4, 2), (5, 2)), ((2, 3), (3, 3), (4, 3), (5, 3)), ((2, 4), (3, 4), (4, 4), (5, 4)), ((2, 5), (3, 5), (4, 5), (5, 5)), ((2, 6), (3, 6), (4, 6), (5, 6)), ((0, 0), (1, 1), (2, 2), (3, 3)), ((0, 1), (1, 2), (2, 3), (3, 4)), ((0, 2), (1, 3), (2, 4), (3, 5)), ((0, 3), (1, 4), (2, 5), (3, 6)), ((1, 0), (2, 1), (3, 2), (4, 3)), ((1, 1), (2, 2), (3, 3), (4, 4)), ((1, 2), (2, 3), (3, 4), (4, 5)), ((1, 3), (2, 4), (3, 5), (4, 6)), ((2, 0), (3, 1), (4, 2), (5, 3)), ((2, 1), (3, 2), (4, 3), (5, 4)), ((2, 2), (3, 3), (4, 4), (5, 5)), ((2, 3), (3, 4), (4, 5), (5, 6)), ((0, 3), (1, 2), (2, 1), (3, 0)), ((0, 4), (1, 3), (2, 2), (3, 1)), ((0, 5), (1, 4), (2, 3), (3, 2)), ((0, 6), (1, 5), (2, 4), (3, 3)), ((1, 3), (2, 2), (3, 1), (4, 0)), ((1, 4), (2, 3), (3, 2), (4, 1)), ((1, 5), (2, 4), (3, 3), (4, 2)), ((1, 6), (2, 5), (3, 4), (4, 3)), ((2, 3), (3, 2), (4, 1), (5, 0)), ((2, 4), (3, 3), (4, 2), (5, 1)), ((2, 5), (3, 4), (4, 3), (5, 2)), ((2, 6), (3, 5), (4, 4), (5, 3))) 
 		winchecks = []
 		for location in winlocations:
 			wc = []
@@ -189,13 +189,13 @@ class Connect4State(object):
 		for w, x, y, z in winchecks:  
 			if w == x == y == z != 0:
 				return []
-		moves = [i for i in range(6) if self.heights[i] < 6]
+		moves = [i for i in range(7) if self.heights[i] < 6]
 		return moves
 
 	def GetResult(self, playerjm):
 		""" Get the game result from the viewpoint of playerjm. 
 		"""
-		winlocations  = () # update with all 69 possible win locations as a tuple of tuple of tuples
+		winlocations  = (((0, 0), (0, 1), (0, 2), (0, 3)), ((0, 1), (0, 2), (0, 3), (0, 4)), ((0, 2), (0, 3), (0, 4), (0, 5)), ((0, 3), (0, 4), (0, 5), (0, 6)), ((1, 0), (1, 1), (1, 2), (1, 3)), ((1, 1), (1, 2), (1, 3), (1, 4)), ((1, 2), (1, 3), (1, 4), (1, 5)), ((1, 3), (1, 4), (1, 5), (1, 6)), ((2, 0), (2, 1), (2, 2), (2, 3)), ((2, 1), (2, 2), (2, 3), (2, 4)), ((2, 2), (2, 3), (2, 4), (2, 5)), ((2, 3), (2, 4), (2, 5), (2, 6)), ((3, 0), (3, 1), (3, 2), (3, 3)), ((3, 1), (3, 2), (3, 3), (3, 4)), ((3, 2), (3, 3), (3, 4), (3, 5)), ((3, 3), (3, 4), (3, 5), (3, 6)), ((4, 0), (4, 1), (4, 2), (4, 3)), ((4, 1), (4, 2), (4, 3), (4, 4)), ((4, 2), (4, 3), (4, 4), (4, 5)), ((4, 3), (4, 4), (4, 5), (4, 6)), ((5, 0), (5, 1), (5, 2), (5, 3)), ((5, 1), (5, 2), (5, 3), (5, 4)), ((5, 2), (5, 3), (5, 4), (5, 5)), ((5, 3), (5, 4), (5, 5), (5, 6)), ((0, 0), (1, 0), (2, 0), (3, 0)), ((0, 1), (1, 1), (2, 1), (3, 1)), ((0, 2), (1, 2), (2, 2), (3, 2)), ((0, 3), (1, 3), (2, 3), (3, 3)), ((0, 4), (1, 4), (2, 4), (3, 4)), ((0, 5), (1, 5), (2, 5), (3, 5)), ((0, 6), (1, 6), (2, 6), (3, 6)), ((1, 0), (2, 0), (3, 0), (4, 0)), ((1, 1), (2, 1), (3, 1), (4, 1)), ((1, 2), (2, 2), (3, 2), (4, 2)), ((1, 3), (2, 3), (3, 3), (4, 3)), ((1, 4), (2, 4), (3, 4), (4, 4)), ((1, 5), (2, 5), (3, 5), (4, 5)), ((1, 6), (2, 6), (3, 6), (4, 6)), ((2, 0), (3, 0), (4, 0), (5, 0)), ((2, 1), (3, 1), (4, 1), (5, 1)), ((2, 2), (3, 2), (4, 2), (5, 2)), ((2, 3), (3, 3), (4, 3), (5, 3)), ((2, 4), (3, 4), (4, 4), (5, 4)), ((2, 5), (3, 5), (4, 5), (5, 5)), ((2, 6), (3, 6), (4, 6), (5, 6)), ((0, 0), (1, 1), (2, 2), (3, 3)), ((0, 1), (1, 2), (2, 3), (3, 4)), ((0, 2), (1, 3), (2, 4), (3, 5)), ((0, 3), (1, 4), (2, 5), (3, 6)), ((1, 0), (2, 1), (3, 2), (4, 3)), ((1, 1), (2, 2), (3, 3), (4, 4)), ((1, 2), (2, 3), (3, 4), (4, 5)), ((1, 3), (2, 4), (3, 5), (4, 6)), ((2, 0), (3, 1), (4, 2), (5, 3)), ((2, 1), (3, 2), (4, 3), (5, 4)), ((2, 2), (3, 3), (4, 4), (5, 5)), ((2, 3), (3, 4), (4, 5), (5, 6)), ((0, 3), (1, 2), (2, 1), (3, 0)), ((0, 4), (1, 3), (2, 2), (3, 1)), ((0, 5), (1, 4), (2, 3), (3, 2)), ((0, 6), (1, 5), (2, 4), (3, 3)), ((1, 3), (2, 2), (3, 1), (4, 0)), ((1, 4), (2, 3), (3, 2), (4, 1)), ((1, 5), (2, 4), (3, 3), (4, 2)), ((1, 6), (2, 5), (3, 4), (4, 3)), ((2, 3), (3, 2), (4, 1), (5, 0)), ((2, 4), (3, 3), (4, 2), (5, 1)), ((2, 5), (3, 4), (4, 3), (5, 2)), ((2, 6), (3, 5), (4, 4), (5, 3)))
 		winchecks = []
 		for location in winlocations:
 			wc = []
@@ -204,7 +204,7 @@ class Connect4State(object):
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
 			if w == x == y == z != 0:
-				if self.playerJustMoved == playerjm:
+				if w == playerjm:
 					return 1
 				else:
 					return 0
@@ -360,7 +360,7 @@ def MUTCPlayGame():
     # state = NimState(15) # uncomment to play Nim with the given number of starting chips
     boards = []
     while (state.GetMoves() != []):
-        m = MUCT(rootstate = state, itermax = 12, verbose = False) # play with values for itermax and verbose = True
+        m = MUCT(rootstate = state, itermax = 50, verbose = False) # play with values for itermax and verbose = True
         state.DoMove(m)
         simpleboard = [piece for layer in state.board for piece in layer]
         boards.append(simpleboard)
@@ -388,11 +388,11 @@ def Practice_Session(minibatch_size, eta):
         training_data += d
     EvalNetwork.update_mini_batch(training_data, eta)
 
-def Train(practice_sessions, minibatch_size, eta):
+def Train(practice_sessions, minibatch_size, eta, network):
 	for s in range(practice_sessions):
 		Practice_Session(minibatch_size, eta)
 		print("practice session {0} completed\n".format(s))
-	print("training complete\n")
+	print("training complete\nWeights: " + str(EvalNetwork.weights) + "\nBiases: " + EvalNetwork.biases)
 
 def GetHumanMove(state):
     """ Ask human player for move and determine if it's legal.
@@ -433,9 +433,9 @@ def MUCTPlayHuman():
             else:
                 m = GetHumanMove(state)
             state.DoMove(m)
-        if state.GetResult(state.playerJustMoved) == humanplayer:
+        if state.GetResult(humanplayer) == 1:
             print(repr(state) + "\nYou win!!\n")
-        elif state.GetResult(state.playerJustMoved) == (3 - humanplayer):
+        elif state.GetResult(humanplayer) == 0:
             print(repr(state) + "\nYou lose.\n")
         else:
             print(repr(state) + "\nIt's a draw!\n")
@@ -445,24 +445,28 @@ def MUCTPlayHuman():
     print("Goodbye.")
 							  
 if __name__ == "__main__":
-	""" Play as human v the MUCT player
-	"""
-	# hiddenlayerneurons = eval(input("How many hidden layer neurons for this model?\n"))
-	# while isinstance(hiddenlayerneurons, int) != True or hiddenlayerneurons < 0:
-	#         hiddenlayerneurons = eval(input("Error: Please input a positive integer.\n"))
-	networksizes = [42,50,1]# [42, hiddenlayerneurons, 1]
-	eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
-	# while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
-	#         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
-	minibatchsize = 10# eval(input("How many games per practice session?\n"))
-	# while isinstance(minibatchsize, int) != True or minibatchsize < 0:
-	#         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
-	numsessions = 11# eval(input("How many practice sessions to complete training?\n"))
-	# while isinstance(numsessions, int) != True or numsessions < 0:
-	#         numsessions = eval(input("Error: Please input a positive integer.\n"))
-	EvalNetwork = Network(networksizes)
-	Train(numsessions, minibatchsize, eta)
-	MUCTPlayHuman()
+    """ Play as human v the MUCT player
+    """
+    # hiddenlayerneurons = eval(input("How many hidden layer neurons for this model?\n"))
+    # while isinstance(hiddenlayerneurons, int) != True or hiddenlayerneurons < 0:
+    #         hiddenlayerneurons = eval(input("Error: Please input a positive integer.\n"))
+    networksizes = [42,20,1]# [42, hiddenlayerneurons, 1]
+    # starting_weights = 
+    # starting_biases =
+    eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
+    # while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
+    #         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
+    minibatchsize = 10# eval(input("How many games per practice session?\n"))
+    # while isinstance(minibatchsize, int) != True or minibatchsize < 0:
+    #         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
+    numsessions = 15# eval(input("How many practice sessions to complete training?\n"))
+    # while isinstance(numsessions, int) != True or numsessions < 0:
+    #         numsessions = eval(input("Error: Please input a positive integer.\n"))
+    EvalNetwork = Network(networksizes)
+    # EvalNetwork.weights = 
+    # EvalNetwork.biases = 
+    Train(numsessions, minibatchsize, eta, EvalNetwork)
+    MUCTPlayHuman()
 
 """
 IDEAS FOR FUTURE IMPROVEMENTS
