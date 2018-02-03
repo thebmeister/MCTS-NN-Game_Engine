@@ -164,8 +164,8 @@ class Connect4State(object):
 		self.playerJustMoved = 2 # At the root pretend the player just moved is p2 - p1 has the first move
 		self.board = [] # 0 = empty, 1 = player 1, 2 = player 2
 		for i in range(6):
-			self.board.append([0]*7)
-		self.heights = [0]*7
+			self.board.append([1.5]*7)
+		self.heights = [1.5]*7
 
 	def Clone(self):
 		""" Create a deep clone of this game state.
@@ -208,7 +208,7 @@ class Connect4State(object):
 				wc.append(self.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
-			if w == x == y == z != 0:
+			if w == x == y == z != 1.5:
 				return []
 		moves = [i for i in range(7) if self.heights[i] < 6]
 		return moves
@@ -224,7 +224,7 @@ class Connect4State(object):
 				wc.append(self.board[h][c])
 			winchecks.append(wc)
 		for w, x, y, z in winchecks:  
-			if w == x == y == z != 0:
+			if w == x == y == z != 1.5:
 				if w == playerjm:
 					return 1
 				else:
@@ -350,9 +350,10 @@ def MUCT(evalnetwork, rootstate, itermax, verbose = False):
             boardevals = []
             for move in state.GetMoves():
                 state.DoMove(move)
-                newsimpleboard = [piece for layer in state.board for piece in layer]
+                newsimpleboard = [piece for layer in state.board for piece in layer] - 1
                 boardeval = evalnetwork.feedforward(newsimpleboard)[0, 0]
-                boardevals.append(boardeval)
+		pjmeval = abs(state.playerJustMoved - 1 - boardeval)
+                boardevals.append(pjmeval)
                 state.UndoMove(move)
             weights = softmax(boardevals)
             assert len(weights) == len(state.GetMoves())
@@ -383,24 +384,12 @@ def MUTCPlayGame(evalnetwork):
     while (state.GetMoves() != []):
         m = MUCT(evalnetwork, rootstate = state, itermax = 100, verbose = False) # play with values for itermax and verbose = True
         state.DoMove(m)
-        simpleboard = [piece for layer in state.board for piece in layer]
+        simpleboard = [piece for layer in state.board for piece in layer] - 1
         boards.append(simpleboard)
-    if state.GetResult(state.playerJustMoved) == 1:
-        result = 1
-        results = []
-        for board in boards:
-            results.append(result)
-            result = 1 - result
-        results.reverse()
-        data = [(x,y) for x, y in zip(boards, results)]
-        return data
-    else:
-        result = 0.5
-        results = []
-        for board in boards:
-            results.append(result)
-        data = [(x,y) for x, y in zip(boards, results)]
-        return data
+    result = state.GetResult(1)
+    results = [result*len(boards)]
+    data = [(x,y) for x, y in zip(boards, results)]
+    return data
 
 def Practice_Session(minibatch_size, eta, evalnetwork):
     training_data = []
