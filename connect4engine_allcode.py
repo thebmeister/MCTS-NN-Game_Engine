@@ -21,7 +21,7 @@ and omits many desirable features.
 #### Libraries
 # Standard library
 import random
-
+import json
 # Third-party libraries
 import numpy as np
 
@@ -100,11 +100,32 @@ class Network(object):
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, np.transpose(activations[-l-1]))
         return (nabla_b, nabla_w)
+    
+    def save(self, filename):
+        """Save the neural network to the file ``filename``."""
+        data = {"sizes": self.sizes,
+                "weights": [w.tolist() for w in self.weights],
+                "biases": [b.tolist() for b in self.biases]}
+        f = open(filename, "w")
+        json.dump(data, f)
+        f.close()
 
 #### Miscellaneous functions
 def sigmoid(z):
     """The sigmoid function."""
     return 1.0/(1.0+np.exp(-z))
+
+def load(filename):
+    """Load a neural network from the file ``filename``.  Returns an
+    instance of Network.
+    """
+    f = open(filename, "r")
+    data = json.load(f)
+    f.close()
+    net = Network(data["sizes"])
+    net.weights = [np.array(w) for w in data["weights"]]
+    net.biases = [np.array(b) for b in data["biases"]]
+    return net
 
 """
 MCTS.py
@@ -360,7 +381,7 @@ def MUTCPlayGame(evalnetwork):
     # state = NimState(15) # uncomment to play Nim with the given number of starting chips
     boards = []
     while (state.GetMoves() != []):
-        m = MUCT(evalnetwork, rootstate = state, itermax = 50, verbose = False) # play with values for itermax and verbose = True
+        m = MUCT(evalnetwork, rootstate = state, itermax = 100, verbose = False) # play with values for itermax and verbose = True
         state.DoMove(m)
         simpleboard = [piece for layer in state.board for piece in layer]
         boards.append(simpleboard)
@@ -392,10 +413,7 @@ def Train(practice_sessions, minibatch_size, eta, evalnetwork):
     for s in range(practice_sessions):
         Practice_Session(minibatch_size, eta, evalnetwork)
         print("practice session {0} completed\n".format(s))
-    print("training complete\nWeights: ")
-    print(evalnetwork.weights)
-    print("\nBiases: ")
-    print(evalnetwork.biases)
+    evalnetwork.save("connect4net.json")
     return evalnetwork
 
 def GetHumanMove(state):
@@ -432,8 +450,8 @@ def MUCTPlayHuman(evalnetwork):
             humanplayer = eval(input("Error: Please input either 1 or 2.\n"))
         while (state.GetMoves() != []):
             print(repr(state))
-			simpleboard = [piece for layer in state.board for piece in layer]
-			print(evalnetork.feedforward(simpleboard)[0,0])
+            simpleboard = [piece for layer in state.board for piece in layer]
+            print(evalnetwork.feedforward(simpleboard)[0,0])
             if state.playerJustMoved == humanplayer:
                 m = MUCT(evalnetwork, rootstate = state, itermax = iterations, verbose = False)
             else:
@@ -462,13 +480,13 @@ if __name__ == "__main__":
     eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
     # while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
     #         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
-    minibatchsize = 5# eval(input("How many games per practice session?\n"))
+    minibatchsize = 10# eval(input("How many games per practice session?\n"))
     # while isinstance(minibatchsize, int) != True or minibatchsize < 0:
     #         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
-    numsessions = 1# eval(input("How many practice sessions to complete training?\n"))
+    numsessions = 5# eval(input("How many practice sessions to complete training?\n"))
     # while isinstance(numsessions, int) != True or numsessions < 0:
     #         numsessions = eval(input("Error: Please input a positive integer.\n"))
-    EvalNetwork = Network(networksizes)
+    EvalNetwork = load("connect4net.json")
     # EvalNetwork.weights = 
     # EvalNetwork.biases = 
     EvalNetwork = Train(numsessions, minibatchsize, eta, EvalNetwork)
