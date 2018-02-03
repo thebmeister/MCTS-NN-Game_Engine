@@ -432,6 +432,8 @@ def MUCTPlayHuman(evalnetwork):
             humanplayer = eval(input("Error: Please input either 1 or 2.\n"))
         while (state.GetMoves() != []):
             print(repr(state))
+			simpleboard = [piece for layer in state.board for piece in layer]
+			print(evalnetork.feedforward(simpleboard)[0,0])
             if state.playerJustMoved == humanplayer:
                 m = MUCT(evalnetwork, rootstate = state, itermax = iterations, verbose = False)
             else:
