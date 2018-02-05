@@ -69,25 +69,20 @@ class Network(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.nabla_b_sq_avg = [0.9*nbsa + 0.1*nb
-                               for nbsa, nb in zip(self.nabla_b_sq_avg, nabla_b)]
-        self.nabla_w_sq_avg = [0.9*nwsa + 0.1*nw
-                               for nwsa, nw in zip(self.nabla_w_sq_avg, nabla_w)]
+	
+        self.nabla_b_sq_avg = [0.9*nbsa + 0.1*nb for nbsa, nb in zip(self.nabla_b_sq_avg, nabla_b)]
+        self.nabla_w_sq_avg = [0.9*nwsa + 0.1*nw for nwsa, nw in zip(self.nabla_w_sq_avg, nabla_w)]
         
         delta_b = [-(np.sqrt(dbsa + 0.00000001)/np.sqrt(nbsa + 0.00000001))*nb
                    for dbsa, nbsa, nb in zip(self.delta_b_sq_avg, self.nabla_b_sq_avg, nabla_b)]
         delta_w = [-(np.sqrt(dwsa + 0.00000001)/np.sqrt(nwsa + 0.00000001))*nw
                    for dwsa, nwsa, nw in zip(self.delta_w_sq_avg, self.nabla_w_sq_avg, nabla_w)]
         
-        self.delta_b_sq_avg = [0.9*dbsa + 0.1*db
-                               for dbsa, db in zip(self.delta_b_sq_avg, delta_b)]
-        self.delta_w_sq_avg = [0.9*dwsa + 0.1*dw
-                               for dwsa, dw in zip(self.delta_w_sq_avg, delta_w)]
+        self.delta_b_sq_avg = [0.9*dbsa + 0.1*db for dbsa, db in zip(self.delta_b_sq_avg, delta_b)]
+        self.delta_w_sq_avg = [0.9*dwsa + 0.1*dw for dwsa, dw in zip(self.delta_w_sq_avg, delta_w)]
         
-        self.biases = [b + delta_b/len(mini_batch)
-                       for b, db in zip(self.biases, delta_b)]
-        self.weights = [0.99999*w + delta_w/len(mini_batch)
-                        for w, dw in zip(self.weights, delta_w)]
+        self.biases = [b + delta_b/len(mini_batch) for b, db in zip(self.biases, delta_b)]
+        self.weights = [0.99999*w + delta_w/len(mini_batch) for w, dw in zip(self.weights, delta_w)]
 
     def backprop(self, x, y):
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
