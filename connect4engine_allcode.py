@@ -244,7 +244,10 @@ class Connect4State(object):
 				  (0,0),  (0,1),  (0,2),  (0,3),  (0,4),  (0,5),  (0,6))
 		s = " "
 		for h, c in places:
-			s += "_12"[self.board[h][c]] + " "
+			if self.board[h][c] == 1.5:
+				s += "_ "
+			else:
+				s += "_12"[self.board[h][c]] + " "
 			if c == 6: s += "\n "
 		return s
 		
