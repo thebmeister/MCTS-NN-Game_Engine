@@ -79,9 +79,9 @@ class Network(object):
         delta_w = [-(np.sqrt(dwsa + 0.00000001)/np.sqrt(nwsa + 0.00000001))*nw
                    for dwsa, nwsa, nw in zip(self.delta_w_sq_avg, self.nabla_w_sq_avg, nabla_w)]
         
-        self.delta_b_sq_avg = [0.9dbsa + 0.1db
+        self.delta_b_sq_avg = [0.9*dbsa + 0.1*db
                                for dbsa, db in zip(self.delta_b_sq_avg, delta_b)]
-        self.delta_w_sq_avg = [0.9dwsa + 0.1dw
+        self.delta_w_sq_avg = [0.9*dwsa + 0.1*dw
                                for dwsa, dw in zip(self.delta_w_sq_avg, delta_w)]
         
         self.biases = [b + delta_b/len(mini_batch)
