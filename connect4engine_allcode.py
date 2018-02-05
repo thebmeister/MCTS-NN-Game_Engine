@@ -61,8 +61,7 @@ class Network(object):
     def update_mini_batch(self, mini_batch):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
-        The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
-        is the learning rate."""
+        The ``mini_batch`` is a list of tuples ``(x, y)``."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
@@ -410,16 +409,16 @@ def MUTCPlayGame(evalnetwork):
     data = [(x,y) for x, y in zip(boards, results)]
     return data
 
-def Practice_Session(minibatch_size, eta, evalnetwork):
+def Practice_Session(minibatch_size, evalnetwork):
     training_data = []
     for i in range(minibatch_size):
         d = MUTCPlayGame(evalnetwork)
         training_data += d
-    evalnetwork.update_mini_batch(training_data, eta)
+    evalnetwork.update_mini_batch(training_data)
 
-def Train(practice_sessions, minibatch_size, eta, evalnetwork):
+def Train(practice_sessions, minibatch_size, evalnetwork):
     for s in range(practice_sessions):
-        Practice_Session(minibatch_size, eta, evalnetwork)
+        Practice_Session(minibatch_size, evalnetwork)
         print("practice session {0} completed\n".format(s))
     evalnetwork.save("connect4net.json")
     return evalnetwork
@@ -485,9 +484,6 @@ if __name__ == "__main__":
     networksizes = [42,20,1]# [42, hiddenlayerneurons, 1]
     # starting_weights = 
     # starting_biases =
-    eta = 0.1 # eval(input("What learning rate would you like to use?\n"))
-    # while isinstance(eta, float) != True or eta < 0 or eta > 0.5:
-    #         eta = eval(input("Error: Please input a positive number less than 0.5.\n"))
     minibatchsize = 10# eval(input("How many games per practice session?\n"))
     # while isinstance(minibatchsize, int) != True or minibatchsize < 0:
     #         minibatchsize = eval(input("Error: Please input a positive integer.\n"))
@@ -497,7 +493,7 @@ if __name__ == "__main__":
     EvalNetwork = load("connect4net.json")
     # EvalNetwork.weights = 
     # EvalNetwork.biases = 
-    EvalNetwork = Train(numsessions, minibatchsize, eta, EvalNetwork)
+    EvalNetwork = Train(numsessions, minibatchsize, EvalNetwork)
     MUCTPlayHuman(EvalNetwork)
 
 """
